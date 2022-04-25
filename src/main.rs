@@ -1,5 +1,6 @@
 use std::env;
 use std::io;
+use ureq;
 use urlencoding::encode;
 
 fn validate_hash(hash: &str) {
@@ -12,19 +13,21 @@ fn validate_hash(hash: &str) {
     }
 }
 
-fn generate_magnet_link(hash: &str) -> String {
-    let sample = "
-    https://one.com
-    https://two.com
-    https://three.com
-    https://four.com
-    https://five.com
-    ";
+fn get_trackers() -> String {
+    const TRACKER_API_URL: &str = "https://newtrackon.com/api/stable";
 
-    let trackers = sample
+    match ureq::get(TRACKER_API_URL).set("e", "dr").call() {
+        Ok(body) => body.into_string().unwrap(),
+        Err(_) => panic!("Failed to get trackers"),
+    }
+}
+
+fn generate_magnet_link(hash: &str, tracker_list: &str) -> String {
+    let trackers = tracker_list
         .lines()
         .filter(|l| !l.is_empty())
         .map(|l| l.trim())
+        .map(|l| encode(l).into_owned())
         .map(|l| format!("&tr={}", l));
 
     let trackers = trackers.collect::<String>();
@@ -52,9 +55,9 @@ fn main() {
 
     validate_hash(&hash);
 
-    println!("Hash is {}", &hash);
+    let trackers = get_trackers();
 
-    let link = generate_magnet_link(&hash);
-    let link = encode(&link).into_owned();
-    print!("Here's the link \n{}", link);
+    let link = generate_magnet_link(&hash, &trackers);
+
+    println!("{}", link);
 }
