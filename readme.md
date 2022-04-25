@@ -13,10 +13,10 @@ cargo build
 ## Usage
 
 ```bash
-magnet <hash>
+rust-magnet <hash>
 
 # Example
-magnet c12fe1c06bba254a9dc9f519b335aa7c1367a88a
+rust-magnet c12fe1c06bba254a9dc9f519b335aa7c1367a88a
 ```
 
 ## License
