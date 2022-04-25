@@ -49,7 +49,7 @@ fn main() {
     let hash: String = match env::args().nth(1) {
         Some(h) => h,
         None => {
-            println!("Enter a hash:");
+            println!("Magnet Link Generator v0.1\nEnter a hash:");
             let mut hash: String = String::new();
 
             io::stdin()
