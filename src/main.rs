@@ -1,5 +1,6 @@
 use std::env;
 use std::io;
+use std::process;
 use ureq;
 use urlencoding::encode;
 
@@ -7,9 +8,14 @@ fn validate_hash(hash: &str) {
     let length = hash.len();
 
     if length != 40 {
-        panic!("Hash must be 40 characters long, got {}", length)
+        eprintln!(
+            "Hash must be 40 characters long, got length {} - {}",
+            length, &hash
+        );
+        process::exit(1)
     } else if !hash.chars().all(|c| c.is_ascii_hexdigit()) {
-        panic!("Hash must be all hex digits, got {}", &hash);
+        eprintln!("Hash must be all hex digits, got {}", &hash);
+        process::exit(1)
     }
 }
 
@@ -18,7 +24,10 @@ fn get_trackers() -> String {
 
     match ureq::get(TRACKER_API_URL).set("e", "dr").call() {
         Ok(body) => body.into_string().unwrap(),
-        Err(_) => panic!("Failed to get trackers"),
+        Err(_) => {
+            eprintln!("Failed to get trackers");
+            process::exit(1)
+        }
     }
 }
 
@@ -40,7 +49,7 @@ fn main() {
     let hash: String = match env::args().nth(1) {
         Some(h) => h,
         None => {
-            println!("Enter a hash");
+            println!("Enter a hash:");
             let mut hash: String = String::new();
 
             io::stdin()
