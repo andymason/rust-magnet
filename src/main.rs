@@ -1,3 +1,4 @@
+use std::env;
 use std::io;
 
 fn validate_hash(hash: &str) {
@@ -11,13 +12,20 @@ fn validate_hash(hash: &str) {
 }
 
 fn main() {
-    println!("Enter a hash");
+    // Get hash from first stdin argument or ask user for  it
+    let hash: String = match env::args().nth(1) {
+        Some(h) => h,
+        None => {
+            println!("Enter a hash");
+            let mut hash: String = String::new();
 
-    let mut hash: String = String::new();
+            io::stdin()
+                .read_line(&mut hash)
+                .expect("Failed to read input");
 
-    io::stdin()
-        .read_line(&mut hash)
-        .expect("Failed to read input");
+            hash
+        }
+    };
 
     let hash = hash.trim();
 
